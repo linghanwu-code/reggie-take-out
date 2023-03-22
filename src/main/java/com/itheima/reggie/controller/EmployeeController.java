@@ -117,8 +117,6 @@ public class EmployeeController {
     public R<String> update(HttpServletRequest request ,@RequestBody Employee employee ){
         Long employId=(Long) request.getSession().getAttribute("employee");
         log.info(employee.toString());
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(employId);
         employeeService.updateById(employee);
         return R.success("员工信息更新成功");
 
