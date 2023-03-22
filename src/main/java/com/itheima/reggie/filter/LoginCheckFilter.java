@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * 检查用户是否完成登录
@@ -27,6 +28,8 @@ public class LoginCheckFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         String  uri = request.getRequestURI();
+        log.info("拦截到请求{}" ,uri);
+        //定义不需要处理的请求路径
         String[] urls= new String[] {
                 "/employee/login",
                 "/employee/logout",
@@ -34,23 +37,28 @@ public class LoginCheckFilter implements Filter {
                 "front/**"
         };
         if(check(urls,uri)){
+            log.info("本次的请求不需要处理{}",uri);
             filterChain.doFilter(request,response);
             return;
         }
         if (request.getSession().getAttribute("employee")!=null){
+            log.info("session正常");
             filterChain.doFilter(request,response);
             return;
         }
+        log.info("用户未登录");
+//controller里面直接返回R对象是因为框架自动帮我们转换成Json了,这里是filter需要我们手动转成Json数据传回前端
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-       log.info("拦截到请求",uri);
+
+
 
     }
     public boolean check(String[] urls,String requesturl){
         for (String url : urls) {
             boolean match = PATH_MATHER.match(url,requesturl);
-            if (match)
+            if (match) {
                 return true;
-            
+            }
         }
         return false;
 

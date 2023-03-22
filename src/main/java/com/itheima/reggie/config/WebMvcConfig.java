@@ -1,9 +1,16 @@
 package com.itheima.reggie.config;
 
+import com.itheima.reggie.common.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.cbor.MappingJackson2CborHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
+import java.util.List;
+
 @Slf4j
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationSupport{
@@ -16,4 +23,20 @@ public class WebMvcConfig extends WebMvcConfigurationSupport{
         registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
 
     }
+
+    /**
+     * 扩展mvc消息转换器
+     * @param converters
+     */
+    @Override
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        //创建消息转换器对象
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        //创建对象转换器底层使用Jackson将 java对象转换成json
+        converter.setObjectMapper(new JacksonObjectMapper());
+        //将上面的消息转换器将对象追加到mvc框架的转换器集合中
+        converters.add(0,converter);
+
+    }
+
 }
