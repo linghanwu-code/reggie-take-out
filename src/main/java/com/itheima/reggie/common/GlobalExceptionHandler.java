@@ -30,4 +30,12 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(
+            CustomException.class)
+    public R<String> exceptionHander(CustomException ex){
+
+        return R.error(ex.getMessage());
+
+    }
+
 }
