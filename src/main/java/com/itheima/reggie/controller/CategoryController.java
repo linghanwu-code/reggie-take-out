@@ -9,6 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.column;
+
 @Slf4j
 @RestController
 @RequestMapping("/category")
@@ -36,6 +40,23 @@ public class CategoryController {
     public R<String> delete(Long ids){
         categoryService.remove(ids);
         return R.success("删除成功");
+    }
+
+    @PutMapping
+    public R<String> update(@RequestBody Category category){
+        categoryService.updateById(category);
+        return R.success("修改分类成功");
+    }
+    @GetMapping("list")
+     public R<List<Category>> list(Category category){
+        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //第一个是布尔值不是false才执行后面的条件
+        lambdaQueryWrapper.eq(category.getType()!=null,Category::getType,category.getType());
+        lambdaQueryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getCreateTime);
+        List<Category> list = categoryService.list(lambdaQueryWrapper);
+        return R.success(list);
+
+
     }
 
 }

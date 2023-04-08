@@ -35,7 +35,10 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "front/**"
+                "/front/**",
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
         if(check(urls,uri)){
             log.info("本次的请求不需要处理{}",uri);
@@ -52,9 +55,19 @@ public class LoginCheckFilter implements Filter {
         }
         log.info("用户未登录");
 //controller里面直接返回R对象是因为框架自动帮我们转换成Json了,这里是filter需要我们手动转成Json数据传回前端
+        //
+
+        //判断客户端登录状态,如果已经登录则直接放行
+        if (request.getSession().getAttribute("user")!=null){
+            log.info("session正常");
+            Long userId=(Long)request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
+            filterChain.doFilter(request,response);
+            return;
+        }
+
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-
-
+        return;
 
     }
     public boolean check(String[] urls,String requesturl){
